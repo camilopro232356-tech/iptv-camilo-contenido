@@ -2758,5 +2758,50 @@
     }
    ]
   }
+ ],
+ "whatsapp": "573205893701",
+ "premium": [
+  {
+   "nombre": "HBO Max",
+   "categoria": "Series y cine",
+   "imagen": "",
+   "url": "https://www.hbomax.com/co/es",
+   "descripcion": "Series y películas de HBO, Warner, DC y Discovery. Tiene plan básico con anuncios y planes sin anuncios."
+  },
+  {
+   "nombre": "Disney+ con ESPN",
+   "categoria": "Deportes",
+   "imagen": "",
+   "url": "https://www.disneyplus.com/es-co",
+   "descripcion": "Los canales ESPN en vivo (Champions, LaLiga, Premier, NBA, NFL) vienen solo en el plan Premium de Disney+. Incluye Disney, Pixar, Marvel y Star Wars."
+  },
+  {
+   "nombre": "Win Play (Win Sports y Win+ Fútbol)",
+   "categoria": "Deportes",
+   "imagen": "",
+   "url": "https://winplay.co",
+   "descripcion": "La plataforma oficial de Win Sports: el fútbol colombiano (Liga BetPlay) en vivo por internet."
+  },
+  {
+   "nombre": "DGO (DIRECTV)",
+   "categoria": "Deportes",
+   "imagen": "",
+   "url": "https://www.directvgo.com",
+   "descripcion": "TV en vivo por internet con canales y deportes. Según el plan, incluye Win+ Fútbol, ESPN, Disney+ Premium y Paramount+."
+  },
+  {
+   "nombre": "Paramount+",
+   "categoria": "Series y cine",
+   "imagen": "",
+   "url": "https://www.paramountplus.com",
+   "descripcion": "Series, películas, Nickelodeon y algo de fútbol."
+  },
+  {
+   "nombre": "Netflix",
+   "categoria": "Series y cine",
+   "imagen": "",
+   "url": "https://www.netflix.com/co/",
+   "descripcion": "Series y películas originales, anime y documentales."
+  }
  ]
 }
