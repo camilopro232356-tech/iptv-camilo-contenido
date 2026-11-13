@@ -18,35 +18,287 @@
   ],
   "peliculas": [
     {
+      "nombre": "Festival de Charlie Chaplin",
+      "categoria": "Comedia",
+      "imagen": "https://archive.org/services/img/charlie_chaplin_film_fest",
+      "url": "https://archive.org/download/charlie_chaplin_film_fest/charlie_chaplin_film_fest.mp4"
+    },
+    {
+      "nombre": "Juan Nadie",
+      "categoria": "Comedia",
+      "imagen": "https://archive.org/services/img/meet_john_doe",
+      "url": "https://archive.org/download/meet_john_doe/meet_john_doe.mp4"
+    },
+    {
+      "nombre": "Laurel y Hardy: Los diablos voladores",
+      "categoria": "Comedia",
+      "imagen": "https://archive.org/services/img/TheFlyingDeuces",
+      "url": "https://archive.org/download/TheFlyingDeuces/The_Flying_Deuces.mp4"
+    },
+    {
+      "nombre": "Los Tres Chiflados",
+      "categoria": "Comedia",
+      "imagen": "https://archive.org/services/img/3stooges",
+      "url": "https://archive.org/download/3stooges/3stooges_NewApants2.mp4"
+    },
+    {
+      "nombre": "Luna nueva (His Girl Friday)",
+      "categoria": "Comedia",
+      "imagen": "https://archive.org/services/img/his_girl_friday",
+      "url": "https://archive.org/download/his_girl_friday/his_girl_friday.mp4"
+    },
+    {
+      "nombre": "Mi morena favorita",
+      "categoria": "Comedia",
+      "imagen": "https://archive.org/services/img/my_favorite_brunette",
+      "url": "https://archive.org/download/my_favorite_brunette/my_favorite_brunette.mp4"
+    },
+    {
+      "nombre": "Mr. Robinson Crusoe",
+      "categoria": "Comedia",
+      "imagen": "https://archive.org/services/img/mr_robinson_crusoe",
+      "url": "https://archive.org/download/mr_robinson_crusoe/video.mp4"
+    },
+    {
+      "nombre": "Carnaval de almas",
+      "categoria": "Terror",
+      "imagen": "https://archive.org/services/img/CarnivalofSouls",
+      "url": "https://archive.org/download/CarnivalofSouls/CarnivalOfSouls.mp4"
+    },
+    {
+      "nombre": "El espectro (The Ghoul)",
+      "categoria": "Terror",
+      "imagen": "https://archive.org/services/img/TheGhoul",
+      "url": "https://archive.org/download/TheGhoul/TheGhoul_1933.mp4"
+    },
+    {
+      "nombre": "El fantasma de la ópera (1925)",
+      "categoria": "Terror",
+      "imagen": "https://archive.org/services/img/ThePhantomoftheOpera",
+      "url": "https://archive.org/download/ThePhantomoftheOpera/Phantom_of_the_Opera_512kb.mp4"
+    },
+    {
+      "nombre": "El gabinete del Dr. Caligari",
+      "categoria": "Terror",
+      "imagen": "https://archive.org/services/img/DasKabinettdesDoktorCaligariTheCabinetofDrCaligari",
+      "url": "https://archive.org/download/DasKabinettdesDoktorCaligariTheCabinetofDrCaligari/The_Cabinet_of_Dr._Caligari_512kb.mp4"
+    },
+    {
+      "nombre": "La casa del terror",
+      "categoria": "Terror",
+      "imagen": "https://archive.org/services/img/house_on_haunted_hill_ipod",
+      "url": "https://archive.org/download/house_on_haunted_hill_ipod/house_on_haunted_hill_512kb.mp4"
+    },
+    {
+      "nombre": "Pánico en el Transiberiano",
+      "categoria": "Terror",
+      "imagen": "https://archive.org/services/img/Horror_Express",
+      "url": "https://archive.org/download/Horror_Express/Horror_Express.mp4"
+    },
+    {
+      "nombre": "Arenas movedizas",
+      "categoria": "Suspenso",
+      "imagen": "https://archive.org/services/img/Quicksand_clear",
+      "url": "https://archive.org/download/Quicksand_clear/Quicksand.mp4"
+    },
+    {
+      "nombre": "El agente secreto (Hitchcock)",
+      "categoria": "Suspenso",
+      "imagen": "https://archive.org/services/img/Hitchcock_Secret_Agent",
+      "url": "https://archive.org/download/Hitchcock_Secret_Agent/Secret_Agent_512kb.mp4"
+    },
+    {
+      "nombre": "El extraño",
+      "categoria": "Suspenso",
+      "imagen": "https://archive.org/services/img/TheStranger_0",
+      "url": "https://archive.org/download/TheStranger_0/The_Stranger.mp4"
+    },
+    {
+      "nombre": "Impacto",
+      "categoria": "Suspenso",
+      "imagen": "https://archive.org/services/img/impact",
+      "url": "https://archive.org/download/impact/impact.mp4"
+    },
+    {
+      "nombre": "Perversidad",
+      "categoria": "Suspenso",
+      "imagen": "https://archive.org/services/img/ScarletStreet",
+      "url": "https://archive.org/download/ScarletStreet/Scarlet_Street.mp4"
+    },
+    {
+      "nombre": "Sherlock Holmes y el arma secreta",
+      "categoria": "Suspenso",
+      "imagen": "https://archive.org/services/img/secret_weapon",
+      "url": "https://archive.org/download/secret_weapon/sherlock_holmes_and_the_secret_weapon.mp4"
+    },
+    {
+      "nombre": "Sherlock Holmes: Vestida para matar",
+      "categoria": "Suspenso",
+      "imagen": "https://archive.org/services/img/dressed_to_kill",
+      "url": "https://archive.org/download/dressed_to_kill/dressed_to_kill.mp4"
+    },
+    {
+      "nombre": "Suddenly",
+      "categoria": "Suspenso",
+      "imagen": "https://archive.org/services/img/suddenly",
+      "url": "https://archive.org/download/suddenly/suddenly.mp4"
+    },
+    {
+      "nombre": "20.000 leguas de viaje submarino (1916)",
+      "categoria": "Aventura",
+      "imagen": "https://archive.org/services/img/20000LeaguesUndertheSea",
+      "url": "https://archive.org/download/20000LeaguesUndertheSea/20000_Leagues_Under_the_Sea_512kb.mp4"
+    },
+    {
+      "nombre": "El libro de la selva (1942)",
+      "categoria": "Aventura",
+      "imagen": "https://archive.org/services/img/JungleBook",
+      "url": "https://archive.org/download/JungleBook/Jungle_Book.mp4"
+    },
+    {
+      "nombre": "El mundo perdido (1925)",
+      "categoria": "Aventura",
+      "imagen": "https://archive.org/services/img/lost_world",
+      "url": "https://archive.org/download/lost_world/lost_world.mp4"
+    },
+    {
+      "nombre": "La máscara de hierro",
+      "categoria": "Aventura",
+      "imagen": "https://archive.org/services/img/iron_mask",
+      "url": "https://archive.org/download/iron_mask/iron_mask.mp4"
+    },
+    {
+      "nombre": "La venganza de Tarzán",
+      "categoria": "Aventura",
+      "imagen": "https://archive.org/services/img/tarzans_revenge",
+      "url": "https://archive.org/download/tarzans_revenge/tarzans_revenge.mp4"
+    },
+    {
+      "nombre": "Adolescentes del espacio exterior",
+      "categoria": "Ciencia ficción",
+      "imagen": "https://archive.org/services/img/teenagers_from_outerspace",
+      "url": "https://archive.org/download/teenagers_from_outerspace/Teenagers_from_Outer_Space_512kb.mp4"
+    },
+    {
+      "nombre": "Asesinos del espacio",
+      "categoria": "Ciencia ficción",
+      "imagen": "https://archive.org/services/img/Killers_from_space",
+      "url": "https://archive.org/download/Killers_from_space/Killers_from_space.mp4"
+    },
+    {
+      "nombre": "Tears of Steel",
+      "categoria": "Ciencia ficción",
+      "imagen": "",
+      "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+    },
+    {
+      "nombre": "Viaje al planeta de las mujeres prehistóricas",
+      "categoria": "Ciencia ficción",
+      "imagen": "https://archive.org/services/img/VoyagetothePlanetofPrehistoricWomen",
+      "url": "https://archive.org/download/VoyagetothePlanetofPrehistoricWomen/VoyagetothePlanetofPrehistoricWomen.mp4"
+    },
+    {
+      "nombre": "Camino de Santa Fe",
+      "categoria": "Western",
+      "imagen": "https://archive.org/services/img/Santa_Fe_Trail_movie",
+      "url": "https://archive.org/download/Santa_Fe_Trail_movie/Santa_Fe_Trail.mp4"
+    },
+    {
+      "nombre": "McLintock!",
+      "categoria": "Western",
+      "imagen": "https://archive.org/services/img/mclintok_widescreen",
+      "url": "https://archive.org/download/mclintok_widescreen/McLintock_512kb.mp4"
+    },
+    {
+      "nombre": "Sólo los valientes",
+      "categoria": "Western",
+      "imagen": "https://archive.org/services/img/OnlytheValaint",
+      "url": "https://archive.org/download/OnlytheValaint/OnlytheValaint.mp4"
+    },
+    {
       "nombre": "Big Buck Bunny",
       "categoria": "Animación",
       "imagen": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Big_buck_bunny_poster_big.jpg",
       "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
     },
     {
+      "nombre": "Elephants Dream",
+      "categoria": "Animación",
+      "imagen": "",
+      "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+    },
+    {
+      "nombre": "Los viajes de Gulliver (1939)",
+      "categoria": "Animación",
+      "imagen": "https://archive.org/services/img/gullivers_travels1939",
+      "url": "https://archive.org/download/gullivers_travels1939/gullivers_travels1939.mp4"
+    },
+    {
       "nombre": "Sintel",
       "categoria": "Animación",
       "imagen": "",
       "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+    },
+    {
+      "nombre": "Bodas reales",
+      "categoria": "Clásicos",
+      "imagen": "https://archive.org/services/img/royal_wedding",
+      "url": "https://archive.org/download/royal_wedding/royal_wedding.mp4"
+    },
+    {
+      "nombre": "Cyrano de Bergerac",
+      "categoria": "Clásicos",
+      "imagen": "https://archive.org/services/img/Cyrano_DeBergerac",
+      "url": "https://archive.org/download/Cyrano_DeBergerac/Cyrano_De_Bergerac.mp4"
+    },
+    {
+      "nombre": "El acorazado Potemkin",
+      "categoria": "Clásicos",
+      "imagen": "https://archive.org/services/img/BattleshipPotemkin",
+      "url": "https://archive.org/download/BattleshipPotemkin/Battleship_Potemkin_512kb.mp4"
+    },
+    {
+      "nombre": "El flautista de Hamelín",
+      "categoria": "Clásicos",
+      "imagen": "https://archive.org/services/img/The_Pied_Piper_of_Hamelin",
+      "url": "https://archive.org/download/The_Pied_Piper_of_Hamelin/pied.mp4"
+    },
+    {
+      "nombre": "Grandes esperanzas",
+      "categoria": "Clásicos",
+      "imagen": "https://archive.org/services/img/GreatExpectations1946",
+      "url": "https://archive.org/download/GreatExpectations1946/GreatExpectations1946.mp4"
+    },
+    {
+      "nombre": "La princesita",
+      "categoria": "Clásicos",
+      "imagen": "https://archive.org/services/img/little_princess",
+      "url": "https://archive.org/download/little_princess/little_princess.mp4"
+    },
+    {
+      "nombre": "Serenata nostálgica",
+      "categoria": "Clásicos",
+      "imagen": "https://archive.org/services/img/penny_serenade",
+      "url": "https://archive.org/download/penny_serenade/penny_serenade.mp4"
     }
   ],
   "series": [
     {
-      "nombre": "Serie Demo",
-      "categoria": "Demostración",
-      "imagen": "",
+      "nombre": "Cortos de Charlie Chaplin",
+      "categoria": "Comedia",
+      "imagen": "https://archive.org/services/img/CC_1916_10_02_ThePawnshop",
       "episodios": [
         {
-          "titulo": "Capítulo 1",
+          "titulo": "La casa de empeños",
           "temporada": 1,
           "numero": 1,
-          "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+          "url": "https://archive.org/download/CC_1916_10_02_ThePawnshop/CC_1916_10_02_ThePawnshop_512kb.mp4"
         },
         {
-          "titulo": "Capítulo 2",
+          "titulo": "El conde",
           "temporada": 1,
           "numero": 2,
-          "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+          "url": "https://archive.org/download/CC_1916_09_04_TheCount/CC_1916_09_04_TheCount_512kb.mp4"
         }
       ]
     }
