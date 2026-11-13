@@ -75,6 +75,7 @@ td .acts{display:flex;gap:6px;flex-wrap:wrap}
     <button class="tab" data-t="en_vivo">📺 TV en vivo</button>
     <button class="tab" data-t="peliculas">🎬 Películas</button>
     <button class="tab" data-t="series">🍿 Series</button>
+    <button class="tab" data-t="premium">⭐ Premium</button>
   </div>
 
   <!-- CLIENTES -->
@@ -104,6 +105,7 @@ td .acts{display:flex;gap:6px;flex-wrap:wrap}
         <label>Nombre<input id="cn"></label>
         <label>Categoría<input id="cc" list="cats"></label>
         <label>Imagen (enlace, opcional)<input id="ci"></label>
+        <label id="cdWrap" class="hidden" style="flex:2">Descripción (qué incluye)<input id="cd"></label>
         <label id="cuWrap">Enlace del video (.m3u8 / .mp4)<input id="cu"><span id="cuHint" class="hidden" style="display:block;margin-top:4px">Déjalo vacío para crear un <b>Canal 24/7</b> con tu propio contenido</span></label>
         <button id="cBtn" onclick="saveItem()">+ Agregar</button>
         <button id="cCancel" class="sec hidden" onclick="resetItemForm()">Cancelar</button>
@@ -193,7 +195,7 @@ async function gh(method,body){
 }
 async function load(){
   try{const j=await gh('GET');sha=j.sha;data=JSON.parse(b64ToUtf8(j.content));
-    for(const k of ['usuarios','en_vivo','peliculas','series'])if(!Array.isArray(data[k]))data[k]=[];
+    for(const k of ['usuarios','en_vivo','peliculas','series','premium'])if(!Array.isArray(data[k]))data[k]=[];
     render();return true}
   catch(e){if(e.status===401||e.status===403||e.status===404){logout();$('loginErr').textContent='La llave no es válida o no tiene permiso.'}else toast('No se pudo cargar: '+e.message,true);return false}
 }
@@ -249,10 +251,10 @@ async function resetPass(i){const u=data.usuarios[i];const p=await ask('Nueva co
 async function delUser(i){const u=data.usuarios[i];if(!await ask('¿Borrar al cliente '+u.usuario+'? Ya no podrá entrar.'))return;data.usuarios.splice(i,1);render();await save('Cliente '+u.usuario+' borrado')}
 
 // ---------- CONTENIDO ----------
-function resetItemForm(){editIdx=-1;['cn','cc','ci','cu'].forEach(k=>$(k).value='');$('cBtn').textContent='+ Agregar';$('cCancel').classList.add('hidden');$('formTitle').textContent='Agregar';$('cuWrap').classList.toggle('hidden',tab==='series')}
+function resetItemForm(){editIdx=-1;['cn','cc','ci','cu','cd'].forEach(k=>$(k).value='');$('cBtn').textContent='+ Agregar';$('cCancel').classList.add('hidden');$('formTitle').textContent='Agregar';$('cuWrap').classList.toggle('hidden',tab==='series')}
 function renderItems(){
   const list=data[tab],q=$('qItem').value.toLowerCase();
-  $('cuWrap').classList.toggle('hidden',tab==='series');$('cuHint').classList.toggle('hidden',tab!=='en_vivo');$('thExtra').textContent=tab==='series'?'Episodios':'Enlace';
+  $('cdWrap').classList.toggle('hidden',tab!=='premium');$('cuWrap').classList.toggle('hidden',tab==='series');$('cuHint').classList.toggle('hidden',tab!=='en_vivo');$('thExtra').textContent=tab==='series'?'Episodios':'Enlace';
   $('cats').innerHTML=[...new Set(list.map(x=>x.categoria).filter(Boolean))].map(c=>`<option value="${esc(c)}">`).join('');
   $('tItems').innerHTML=list.map((x,i)=>[x,i]).filter(([x])=>!q||(x.nombre+' '+x.categoria).toLowerCase().includes(q)).map(([x,i])=>`<tr>
   <td>${x.imagen?`<img class="thumb" src="${esc(x.imagen)}" onerror="this.style.visibility='hidden'">`:'<div class="thumb"></div>'}</td>
@@ -260,7 +262,7 @@ function renderItems(){
   <td class="muted">${tab==='series'?(x.episodios||[]).length+' episodios':(x.programacion?'📺 Canal 24/7 · '+x.programacion.length+' programas':esc((x.url||'').slice(0,40))+'…')}</td>
   <td><div class="acts">${tab==='series'?`<button class="sm" onclick="openEpisodes(${i})">Episodios</button>`:''}${tab==='en_vivo'&&x.programacion?`<button class="sm" onclick="openProg(${i})">Programación</button>`:''}<button class="sm sec" onclick="editItem(${i})">Editar</button><button class="sm red" onclick="delItem(${i})">Borrar</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="muted">Nada todavía</td></tr>';
 }
-function editItem(i){const x=data[tab][i];editIdx=i;$('cn').value=x.nombre||'';$('cc').value=x.categoria||'';$('ci').value=x.imagen||'';$('cu').value=x.url||'';$('cBtn').textContent='Guardar';$('cCancel').classList.remove('hidden');$('formTitle').textContent='Editar '+x.nombre;scrollTo(0,0)}
+function editItem(i){const x=data[tab][i];editIdx=i;$('cn').value=x.nombre||'';$('cc').value=x.categoria||'';$('ci').value=x.imagen||'';$('cu').value=x.url||'';$('cd').value=x.descripcion||'';$('cBtn').textContent='Guardar';$('cCancel').classList.remove('hidden');$('formTitle').textContent='Editar '+x.nombre;scrollTo(0,0)}
 async function saveItem(){
   const n=$('cn').value.trim(),c=$('cc').value.trim()||'General',im=$('ci').value.trim(),u=$('cu').value.trim();
   if(!n)return toast('Escribe el nombre',true);
@@ -270,6 +272,7 @@ async function saveItem(){
   if(tab==='series'){item.episodios=item.episodios||[]}
   else if(isChannel){item.programacion=item.programacion||[];item.url=item.programacion[0]?item.programacion[0].url:''}
   else{item.url=u;delete item.programacion}
+  if(tab==='premium')item.descripcion=$('cd').value.trim();
   if(editIdx<0)data[tab].push(item);
   const was=editIdx>=0;resetItemForm();render();await save((was?'Editado ':'Agregado ')+n);
 }
