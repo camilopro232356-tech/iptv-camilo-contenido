@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Panel Camilo</title>
+<style>
+:root{--bg:#0B0F1A;--card:#161C2C;--line:#262f47;--amber:#FFB020;--text:#F2F4F8;--dim:#9AA3B8;--ok:#3ecf8e;--bad:#ff6b6b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1050px;margin:0 auto;padding:18px}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+header h1{font-size:20px;margin:0;flex:1}
+header h1 span{color:var(--amber)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tab{background:var(--card);border:1px solid var(--line);color:var(--text);padding:9px 16px;border-radius:99px;cursor:pointer;font-weight:600}
+.tab.on{background:var(--amber);color:#111;border-color:var(--amber)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.card h2{font-size:16px;margin:0 0 12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
+.row>label{flex:1;min-width:140px;font-size:12px;color:var(--dim)}
+input,select{width:100%;margin-top:4px;background:#0f1424;border:1px solid var(--line);color:var(--text);padding:10px;border-radius:9px;font:inherit}
+button{background:var(--amber);color:#111;border:0;padding:10px 16px;border-radius:9px;font-weight:700;cursor:pointer;font:inherit;font-weight:700}
+button.sec{background:#222b42;color:var(--text)}
+button.red{background:#3a1d24;color:#ffb3b3}
+button.sm{padding:6px 10px;font-size:13px}
+button:disabled{opacity:.5;cursor:wait}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:12px;color:var(--dim);font-weight:600}
+td .acts{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:12px;padding:3px 9px;border-radius:99px;font-weight:700;white-space:nowrap}
+.p-ok{background:#123326;color:var(--ok)}.p-bad{background:#3a1d24;color:var(--bad)}.p-off{background:#2a2f3d;color:var(--dim)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat b{display:block;font-size:24px}.stat span{font-size:12px;color:var(--dim)}
+.muted{color:var(--dim);font-size:13px}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#222b42;border:1px solid var(--line);padding:12px 18px;border-radius:12px;display:none;max-width:90%;z-index:9}
+#toast.err{border-color:var(--bad)}
+.thumb{width:44px;height:44px;object-fit:cover;border-radius:6px;background:#0f1424}
+.hidden{display:none!important}
+.login{max-width:440px;margin:10vh auto}
+@media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}th.hm,td.hm{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div id="login" class="login card hidden">
+  <h2>🔐 Panel Camilo</h2>
+  <p class="muted">Pega tu llave de acceso de GitHub (empieza por <b>github_pat_</b>). Solo se guarda en este navegador.</p>
+  <input id="tok" type="password" placeholder="github_pat_..." autocomplete="off">
+  <p><button onclick="doLogin()">Entrar</button></p>
+  <p id="loginErr" class="muted" style="color:var(--bad)"></p>
+</div>
+
+<div id="app" class="hidden">
+  <header>
+    <h1>Panel <span>Camilo</span></h1>
+    <span id="saving" class="muted"></span>
+    <button class="sec sm" onclick="load()">↻ Recargar</button>
+    <button class="sec sm" onclick="logout()">Salir</button>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><b id="sAct">0</b><span>Clientes activos</span></div>
+    <div class="stat"><b id="sVen">0</b><span>Vencidos</span></div>
+    <div class="stat"><b id="sSus">0</b><span>Suspendidos</span></div>
+    <div class="stat"><b id="sCont">0</b><span>Contenidos</span></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" data-t="usuarios">👥 Clientes</button>
+    <button class="tab" data-t="en_vivo">📺 TV en vivo</button>
+    <button class="tab" data-t="peliculas">🎬 Películas</button>
+    <button class="tab" data-t="series">🍿 Series</button>
+  </div>
+
+  <!-- CLIENTES -->
+  <section id="v-usuarios">
+    <div class="card">
+      <h2>Nuevo cliente</h2>
+      <div class="row">
+        <label>Usuario<input id="nu"></label>
+        <label>Contraseña<input id="np"></label>
+        <label>Vence<input id="nv" type="date"></label>
+        <label>Nota (nombre, teléfono)<input id="nn"></label>
+        <button onclick="addUser()">+ Crear</button>
+      </div>
+      <p class="muted">Atajos de vencimiento: <button class="sec sm" onclick="setDays(30)">1 mes</button> <button class="sec sm" onclick="setDays(90)">3 meses</button> <button class="sec sm" onclick="setDays(365)">1 año</button></p>
+    </div>
+    <div class="card">
+      <div class="row" style="margin-bottom:8px"><label>Buscar cliente<input id="qUser" oninput="renderUsers()"></label></div>
+      <table><thead><tr><th>Usuario</th><th>Estado</th><th>Vence</th><th class="hm">Nota</th><th></th></tr></thead><tbody id="tUsers"></tbody></table>
+    </div>
+  </section>
+
+  <!-- CONTENIDO -->
+  <section id="v-contenido" class="hidden">
+    <div class="card">
+      <h2 id="formTitle">Agregar</h2>
+      <div class="row">
+        <label>Nombre<input id="cn"></label>
+        <label>Categoría<input id="cc" list="cats"></label>
+        <label>Imagen (enlace, opcional)<input id="ci"></label>
+        <label id="cuWrap">Enlace del video (.m3u8 / .mp4)<input id="cu"></label>
+        <button id="cBtn" onclick="saveItem()">+ Agregar</button>
+        <button id="cCancel" class="sec hidden" onclick="resetItemForm()">Cancelar</button>
+      </div>
+      <datalist id="cats"></datalist>
+    </div>
+    <div class="card">
+      <div class="row" style="margin-bottom:8px"><label>Buscar<input id="qItem" oninput="renderItems()"></label></div>
+      <table><thead><tr><th></th><th>Nombre</th><th class="hm">Categoría</th><th id="thExtra">Enlace</th><th></th></tr></thead><tbody id="tItems"></tbody></table>
+    </div>
+  </section>
+
+  <!-- EPISODIOS -->
+  <section id="v-episodios" class="hidden">
+    <div class="card">
+      <h2>Episodios de <span id="epSerie" style="color:var(--amber)"></span> <button class="sec sm" onclick="closeEpisodes()">← Volver a series</button></h2>
+      <div class="row">
+        <label>Título<input id="et"></label>
+        <label>Temporada<input id="es" type="number" min="1" value="1"></label>
+        <label>Número<input id="en" type="number" min="1" value="1"></label>
+        <label>Enlace del video<input id="eu"></label>
+        <button onclick="addEpisode()">+ Agregar episodio</button>
+      </div>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>T</th><th>E</th><th>Título</th><th class="hm">Enlace</th><th></th></tr></thead><tbody id="tEps"></tbody></table>
+    </div>
+  </section>
+
+  <p class="muted">Los cambios se guardan solos y llegan a la app en 1 a 5 minutos.</p>
+</div>
+</div>
+
+<div id="toast"></div>
+<div id="modal" class="hidden" style="position:fixed;inset:0;background:#000a;display:grid;place-items:center;z-index:8">
+  <div class="card" style="max-width:380px;width:90%">
+    <p id="mText" style="white-space:pre-line"></p>
+    <input id="mInput" class="hidden">
+    <p class="row" style="justify-content:flex-end"><button class="sec" onclick="mDone(false)">Cancelar</button><button id="mOk" onclick="mDone(true)">Aceptar</button></p>
+  </div>
+</div>
+
+<script>
+const REPO='camilopro232356-tech/iptv-camilo-contenido', FILE='catalogo.json';
+const API='https://api.github.com/repos/'+REPO+'/contents/'+FILE;
+let TOKEN='', data=null, sha=null, tab='usuarios', editIdx=-1, serieIdx=-1;
+const $=id=>document.getElementById(id);
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+
+function toast(msg,err){const t=$('toast');t.textContent=msg;t.className=err?'err':'';t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',3500)}
+let mRes=null;
+function ask(text,withInput,val){return new Promise(r=>{mRes=r;$('mText').textContent=text;$('mInput').classList.toggle('hidden',!withInput);$('mInput').value=val||'';$('modal').classList.remove('hidden');if(withInput)$('mInput').focus()})}
+function mDone(ok){$('modal').classList.add('hidden');const v=$('mInput').value;mRes&&mRes(ok?( $('mInput').classList.contains('hidden')?true:v):null)}
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>new Date().toISOString().slice(0,10);
+const addDays=(base,n)=>{const d=new Date((base&&base>today()?base:today())+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+
+function b64ToUtf8(b){return new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\n/g,'')),c=>c.charCodeAt(0)))}
+function utf8ToB64(s){const by=new TextEncoder().encode(s);let bin='';for(let i=0;i<by.length;i+=8192)bin+=String.fromCharCode.apply(null,by.subarray(i,i+8192));return btoa(bin)}
+async function sha256(s){const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('')}
+
+async function gh(method,body){
+  const r=await fetch(API+(method==='GET'?'?ref=main&t='+Date.now():''),{method,headers:{Authorization:'Bearer '+TOKEN,Accept:'application/vnd.github+json','Content-Type':'application/json'},body:body?JSON.stringify(body):undefined,cache:'no-store'});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){const e=new Error(j.message||('Error '+r.status));e.status=r.status;throw e}
+  return j;
+}
+async function load(){
+  try{const j=await gh('GET');sha=j.sha;data=JSON.parse(b64ToUtf8(j.content));
+    for(const k of ['usuarios','en_vivo','peliculas','series'])if(!Array.isArray(data[k]))data[k]=[];
+    render();return true}
+  catch(e){if(e.status===401||e.status===403||e.status===404){logout();$('loginErr').textContent='La llave no es válida o no tiene permiso.'}else toast('No se pudo cargar: '+e.message,true);return false}
+}
+let saving=Promise.resolve();
+function save(msg){
+  saving=saving.then(async()=>{
+    $('saving').textContent='Guardando…';
+    try{const j=await gh('PUT',{message:msg,content:utf8ToB64(JSON.stringify(data,null,2)),sha,branch:'main'});sha=j.content.sha;$('saving').textContent='✓ Guardado';toast('✓ '+msg)}
+    catch(e){$('saving').textContent='';toast('No se guardó: '+e.message+'. Recargando…',true);await load()}
+  });return saving;
+}
+
+async function doLogin(){const t=$('tok').value.trim();if(!t)return;TOKEN=t;$('loginErr').textContent='';if(await load()){store.set('pc_tok',t);showApp()}}
+function logout(){store.del('pc_tok');TOKEN='';$('app').classList.add('hidden');$('login').classList.remove('hidden')}
+function showApp(){$('login').classList.add('hidden');$('app').classList.remove('hidden')}
+
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));b.classList.add('on');tab=b.dataset.t;serieIdx=-1;resetItemForm();render()});
+
+function userState(u){if(u.activo===false)return['Suspendido','p-off'];if(u.vence&&u.vence<today())return['Vencido','p-bad'];return['Activo','p-ok']}
+function render(){
+  if(!data)return;
+  const st=data.usuarios.map(userState);
+  $('sAct').textContent=st.filter(s=>s[0]==='Activo').length;$('sVen').textContent=st.filter(s=>s[0]==='Vencido').length;$('sSus').textContent=st.filter(s=>s[0]==='Suspendido').length;
+  $('sCont').textContent=data.en_vivo.length+data.peliculas.length+data.series.length;
+  $('v-usuarios').classList.toggle('hidden',tab!=='usuarios');
+  $('v-contenido').classList.toggle('hidden',tab==='usuarios'||serieIdx>=0);
+  $('v-episodios').classList.toggle('hidden',serieIdx<0);
+  if(tab==='usuarios')renderUsers();else if(serieIdx>=0)renderEpisodes();else renderItems();
+}
+
+// ---------- CLIENTES ----------
+function setDays(n){$('nv').value=addDays(today(),n)}
+async function addUser(){
+  const u=$('nu').value.trim(),p=$('np').value.trim(),v=$('nv').value,n=$('nn').value.trim();
+  if(!u||!p)return toast('Escribe usuario y contraseña',true);
+  if(/\s/.test(u))return toast('El usuario no puede tener espacios',true);
+  if(data.usuarios.some(x=>x.usuario.toLowerCase()===u.toLowerCase()))return toast('Ese usuario ya existe',true);
+  data.usuarios.push({usuario:u,clave_sha256:await sha256(u.toLowerCase()+':'+p),vence:v||addDays(today(),30),activo:true,nota:n});
+  $('nu').value=$('np').value=$('nn').value='';$('nv').value='';
+  render();await save('Cliente '+u+' creado');
+  ask('Cliente creado. Envíale estos datos:\n\nUsuario: '+u+'\nContraseña: '+p+'\nVence: '+(v||addDays(today(),30)));
+}
+function renderUsers(){
+  const q=$('qUser').value.toLowerCase();
+  $('tUsers').innerHTML=data.usuarios.map((u,i)=>[u,i]).filter(([u])=>!q||(u.usuario+' '+(u.nota||'')).toLowerCase().includes(q)).map(([u,i])=>{const[s,c]=userState(u);return `<tr>
+  <td><b>${esc(u.usuario)}</b></td><td><span class="pill ${c}">${s}</span></td><td>${esc(u.vence||'—')}</td><td class="hm muted">${esc(u.nota||'')}</td>
+  <td><div class="acts"><button class="sm" onclick="renew(${i},30)">+1 mes</button><button class="sm sec" onclick="toggleUser(${i})">${u.activo===false?'Activar':'Suspender'}</button><button class="sm sec" onclick="resetPass(${i})">Clave</button><button class="sm red" onclick="delUser(${i})">Borrar</button></div></td></tr>`}).join('')||'<tr><td colspan="5" class="muted">Sin clientes</td></tr>';
+}
+async function renew(i,n){const u=data.usuarios[i];u.vence=addDays(u.vence,n);u.activo=true;render();await save('Renovado '+u.usuario+' hasta '+u.vence)}
+async function toggleUser(i){const u=data.usuarios[i];u.activo=u.activo===false;render();await save((u.activo?'Activado ':'Suspendido ')+u.usuario)}
+async function resetPass(i){const u=data.usuarios[i];const p=await ask('Nueva contraseña para '+u.usuario+':',true);if(!p)return;u.clave_sha256=await sha256(u.usuario.toLowerCase()+':'+p.trim());await save('Clave cambiada a '+u.usuario)}
+async function delUser(i){const u=data.usuarios[i];if(!await ask('¿Borrar al cliente '+u.usuario+'? Ya no podrá entrar.'))return;data.usuarios.splice(i,1);render();await save('Cliente '+u.usuario+' borrado')}
+
+// ---------- CONTENIDO ----------
+function resetItemForm(){editIdx=-1;['cn','cc','ci','cu'].forEach(k=>$(k).value='');$('cBtn').textContent='+ Agregar';$('cCancel').classList.add('hidden');$('formTitle').textContent='Agregar';$('cuWrap').classList.toggle('hidden',tab==='series')}
+function renderItems(){
+  const list=data[tab],q=$('qItem').value.toLowerCase();
+  $('cuWrap').classList.toggle('hidden',tab==='series');$('thExtra').textContent=tab==='series'?'Episodios':'Enlace';
+  $('cats').innerHTML=[...new Set(list.map(x=>x.categoria).filter(Boolean))].map(c=>`<option value="${esc(c)}">`).join('');
+  $('tItems').innerHTML=list.map((x,i)=>[x,i]).filter(([x])=>!q||(x.nombre+' '+x.categoria).toLowerCase().includes(q)).map(([x,i])=>`<tr>
+  <td>${x.imagen?`<img class="thumb" src="${esc(x.imagen)}" onerror="this.style.visibility='hidden'">`:'<div class="thumb"></div>'}</td>
+  <td><b>${esc(x.nombre)}</b></td><td class="hm">${esc(x.categoria)}</td>
+  <td class="muted">${tab==='series'?(x.episodios||[]).length+' episodios':esc((x.url||'').slice(0,40))+'…'}</td>
+  <td><div class="acts">${tab==='series'?`<button class="sm" onclick="openEpisodes(${i})">Episodios</button>`:''}<button class="sm sec" onclick="editItem(${i})">Editar</button><button class="sm red" onclick="delItem(${i})">Borrar</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="muted">Nada todavía</td></tr>';
+}
+function editItem(i){const x=data[tab][i];editIdx=i;$('cn').value=x.nombre||'';$('cc').value=x.categoria||'';$('ci').value=x.imagen||'';$('cu').value=x.url||'';$('cBtn').textContent='Guardar';$('cCancel').classList.remove('hidden');$('formTitle').textContent='Editar '+x.nombre;scrollTo(0,0)}
+async function saveItem(){
+  const n=$('cn').value.trim(),c=$('cc').value.trim()||'General',im=$('ci').value.trim(),u=$('cu').value.trim();
+  if(!n)return toast('Escribe el nombre',true);
+  if(tab!=='series'&&!/^https?:\/\//.test(u))return toast('Pega un enlace de video que empiece por http',true);
+  const item=editIdx>=0?data[tab][editIdx]:{};Object.assign(item,{nombre:n,categoria:c,imagen:im});
+  if(tab==='series'){item.episodios=item.episodios||[]}else item.url=u;
+  if(editIdx<0)data[tab].push(item);
+  const was=editIdx>=0;resetItemForm();render();await save((was?'Editado ':'Agregado ')+n);
+}
+async function delItem(i){const x=data[tab][i];if(!await ask('¿Borrar "'+x.nombre+'"?'))return;data[tab].splice(i,1);render();await save('Borrado '+x.nombre)}
+
+// ---------- EPISODIOS ----------
+function openEpisodes(i){serieIdx=i;$('epSerie').textContent=data.series[i].nombre;const eps=data.series[i].episodios||[];const last=eps[eps.length-1];$('es').value=last?last.temporada:1;$('en').value=last?last.numero+1:1;render()}
+function closeEpisodes(){serieIdx=-1;render()}
+function renderEpisodes(){const eps=data.series[serieIdx].episodios||[];
+  $('tEps').innerHTML=eps.map((e,i)=>`<tr><td>${e.temporada}</td><td>${e.numero}</td><td>${esc(e.titulo)}</td><td class="hm muted">${esc((e.url||'').slice(0,40))}…</td><td><button class="sm red" onclick="delEp(${i})">Borrar</button></td></tr>`).join('')||'<tr><td colspan="5" class="muted">Sin episodios</td></tr>'}
+async function addEpisode(){const s=data.series[serieIdx],u=$('eu').value.trim(),t=+$('es').value||1,n=+$('en').value||1;
+  if(!/^https?:\/\//.test(u))return toast('Pega un enlace de video que empiece por http',true);
+  s.episodios=s.episodios||[];s.episodios.push({titulo:$('et').value.trim()||('Capítulo '+n),temporada:t,numero:n,url:u});
+  s.episodios.sort((a,b)=>a.temporada-b.temporada||a.numero-b.numero);
+  $('et').value=$('eu').value='';$('en').value=n+1;render();await save('Episodio T'+t+'E'+n+' de '+s.nombre)}
+async function delEp(i){const s=data.series[serieIdx];const e=s.episodios[i];if(!await ask('¿Borrar T'+e.temporada+'E'+e.numero+'?'))return;s.episodios.splice(i,1);render();await save('Episodio borrado de '+s.nombre)}
+
+// ---------- INICIO ----------
+(async()=>{const t=store.get('pc_tok');if(t){TOKEN=t;if(await load()){showApp();return}}$('login').classList.remove('hidden')})();
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!$('login').classList.contains('hidden'))doLogin()});
+</script>
+</body>
+</html>
