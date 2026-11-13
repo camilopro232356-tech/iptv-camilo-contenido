@@ -104,7 +104,7 @@ td .acts{display:flex;gap:6px;flex-wrap:wrap}
         <label>Nombre<input id="cn"></label>
         <label>Categoría<input id="cc" list="cats"></label>
         <label>Imagen (enlace, opcional)<input id="ci"></label>
-        <label id="cuWrap">Enlace del video (.m3u8 / .mp4)<input id="cu"></label>
+        <label id="cuWrap">Enlace del video (.m3u8 / .mp4)<input id="cu"><span id="cuHint" class="hidden" style="display:block;margin-top:4px">Déjalo vacío para crear un <b>Canal 24/7</b> con tu propio contenido</span></label>
         <button id="cBtn" onclick="saveItem()">+ Agregar</button>
         <button id="cCancel" class="sec hidden" onclick="resetItemForm()">Cancelar</button>
       </div>
@@ -133,6 +133,26 @@ td .acts{display:flex;gap:6px;flex-wrap:wrap}
     </div>
   </section>
 
+  <!-- PROGRAMACIÓN DE CANAL 24/7 -->
+  <section id="v-prog" class="hidden">
+    <div class="card">
+      <h2>Programación de <span id="pgCanal" style="color:var(--amber)"></span> <button class="sec sm" onclick="closeProg()">← Volver a canales</button></h2>
+      <p class="muted" id="pgInfo"></p>
+      <div class="row">
+        <label style="flex:2">Agregar desde tu catálogo<select id="pgSel"></select></label>
+        <button onclick="addProgFromCatalog()">+ Agregar</button>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <label>…o un video nuevo: título<input id="pgT"></label>
+        <label style="flex:2">Enlace del video (.mp4 / .m3u8)<input id="pgU"></label>
+        <button class="sec" onclick="addProgUrl()">+ Agregar enlace</button>
+      </div>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>#</th><th>Programa</th><th>Duración</th><th></th></tr></thead><tbody id="tProg"></tbody></table>
+    </div>
+  </section>
+
   <p class="muted">Los cambios se guardan solos y llegan a la app en 1 a 5 minutos.</p>
 </div>
 </div>
@@ -149,7 +169,7 @@ td .acts{display:flex;gap:6px;flex-wrap:wrap}
 <script>
 const REPO='camilopro232356-tech/iptv-camilo-contenido', FILE='catalogo.json';
 const API='https://api.github.com/repos/'+REPO+'/contents/'+FILE;
-let TOKEN='', data=null, sha=null, tab='usuarios', editIdx=-1, serieIdx=-1;
+let TOKEN='', data=null, sha=null, tab='usuarios', editIdx=-1, serieIdx=-1, progIdx=-1;
 const $=id=>document.getElementById(id);
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
 
@@ -190,7 +210,7 @@ async function doLogin(){const t=$('tok').value.trim();if(!t)return;TOKEN=t;$('l
 function logout(){store.del('pc_tok');TOKEN='';$('app').classList.add('hidden');$('login').classList.remove('hidden')}
 function showApp(){$('login').classList.add('hidden');$('app').classList.remove('hidden')}
 
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));b.classList.add('on');tab=b.dataset.t;serieIdx=-1;resetItemForm();render()});
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));b.classList.add('on');tab=b.dataset.t;serieIdx=-1;progIdx=-1;resetItemForm();render()});
 
 function userState(u){if(u.activo===false)return['Suspendido','p-off'];if(u.vence&&u.vence<today())return['Vencido','p-bad'];return['Activo','p-ok']}
 function render(){
@@ -199,9 +219,10 @@ function render(){
   $('sAct').textContent=st.filter(s=>s[0]==='Activo').length;$('sVen').textContent=st.filter(s=>s[0]==='Vencido').length;$('sSus').textContent=st.filter(s=>s[0]==='Suspendido').length;
   $('sCont').textContent=data.en_vivo.length+data.peliculas.length+data.series.length;
   $('v-usuarios').classList.toggle('hidden',tab!=='usuarios');
-  $('v-contenido').classList.toggle('hidden',tab==='usuarios'||serieIdx>=0);
+  $('v-contenido').classList.toggle('hidden',tab==='usuarios'||serieIdx>=0||progIdx>=0);
+  $('v-prog').classList.toggle('hidden',progIdx<0);
   $('v-episodios').classList.toggle('hidden',serieIdx<0);
-  if(tab==='usuarios')renderUsers();else if(serieIdx>=0)renderEpisodes();else renderItems();
+  if(tab==='usuarios')renderUsers();else if(serieIdx>=0)renderEpisodes();else if(progIdx>=0)renderProg();else renderItems();
 }
 
 // ---------- CLIENTES ----------
@@ -231,21 +252,24 @@ async function delUser(i){const u=data.usuarios[i];if(!await ask('¿Borrar al cl
 function resetItemForm(){editIdx=-1;['cn','cc','ci','cu'].forEach(k=>$(k).value='');$('cBtn').textContent='+ Agregar';$('cCancel').classList.add('hidden');$('formTitle').textContent='Agregar';$('cuWrap').classList.toggle('hidden',tab==='series')}
 function renderItems(){
   const list=data[tab],q=$('qItem').value.toLowerCase();
-  $('cuWrap').classList.toggle('hidden',tab==='series');$('thExtra').textContent=tab==='series'?'Episodios':'Enlace';
+  $('cuWrap').classList.toggle('hidden',tab==='series');$('cuHint').classList.toggle('hidden',tab!=='en_vivo');$('thExtra').textContent=tab==='series'?'Episodios':'Enlace';
   $('cats').innerHTML=[...new Set(list.map(x=>x.categoria).filter(Boolean))].map(c=>`<option value="${esc(c)}">`).join('');
   $('tItems').innerHTML=list.map((x,i)=>[x,i]).filter(([x])=>!q||(x.nombre+' '+x.categoria).toLowerCase().includes(q)).map(([x,i])=>`<tr>
   <td>${x.imagen?`<img class="thumb" src="${esc(x.imagen)}" onerror="this.style.visibility='hidden'">`:'<div class="thumb"></div>'}</td>
   <td><b>${esc(x.nombre)}</b></td><td class="hm">${esc(x.categoria)}</td>
-  <td class="muted">${tab==='series'?(x.episodios||[]).length+' episodios':esc((x.url||'').slice(0,40))+'…'}</td>
-  <td><div class="acts">${tab==='series'?`<button class="sm" onclick="openEpisodes(${i})">Episodios</button>`:''}<button class="sm sec" onclick="editItem(${i})">Editar</button><button class="sm red" onclick="delItem(${i})">Borrar</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="muted">Nada todavía</td></tr>';
+  <td class="muted">${tab==='series'?(x.episodios||[]).length+' episodios':(x.programacion?'📺 Canal 24/7 · '+x.programacion.length+' programas':esc((x.url||'').slice(0,40))+'…')}</td>
+  <td><div class="acts">${tab==='series'?`<button class="sm" onclick="openEpisodes(${i})">Episodios</button>`:''}${tab==='en_vivo'&&x.programacion?`<button class="sm" onclick="openProg(${i})">Programación</button>`:''}<button class="sm sec" onclick="editItem(${i})">Editar</button><button class="sm red" onclick="delItem(${i})">Borrar</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="muted">Nada todavía</td></tr>';
 }
 function editItem(i){const x=data[tab][i];editIdx=i;$('cn').value=x.nombre||'';$('cc').value=x.categoria||'';$('ci').value=x.imagen||'';$('cu').value=x.url||'';$('cBtn').textContent='Guardar';$('cCancel').classList.remove('hidden');$('formTitle').textContent='Editar '+x.nombre;scrollTo(0,0)}
 async function saveItem(){
   const n=$('cn').value.trim(),c=$('cc').value.trim()||'General',im=$('ci').value.trim(),u=$('cu').value.trim();
   if(!n)return toast('Escribe el nombre',true);
-  if(tab!=='series'&&!/^https?:\/\//.test(u))return toast('Pega un enlace de video que empiece por http',true);
+  const isChannel=tab==='en_vivo'&&!u;
+  if(tab!=='series'&&!isChannel&&!/^https?:\/\//.test(u))return toast('Pega un enlace de video que empiece por http',true);
   const item=editIdx>=0?data[tab][editIdx]:{};Object.assign(item,{nombre:n,categoria:c,imagen:im});
-  if(tab==='series'){item.episodios=item.episodios||[]}else item.url=u;
+  if(tab==='series'){item.episodios=item.episodios||[]}
+  else if(isChannel){item.programacion=item.programacion||[];item.url=item.programacion[0]?item.programacion[0].url:''}
+  else{item.url=u;delete item.programacion}
   if(editIdx<0)data[tab].push(item);
   const was=editIdx>=0;resetItemForm();render();await save((was?'Editado ':'Agregado ')+n);
 }
@@ -262,6 +286,25 @@ async function addEpisode(){const s=data.series[serieIdx],u=$('eu').value.trim()
   s.episodios.sort((a,b)=>a.temporada-b.temporada||a.numero-b.numero);
   $('et').value=$('eu').value='';$('en').value=n+1;render();await save('Episodio T'+t+'E'+n+' de '+s.nombre)}
 async function delEp(i){const s=data.series[serieIdx];const e=s.episodios[i];if(!await ask('¿Borrar T'+e.temporada+'E'+e.numero+'?'))return;s.episodios.splice(i,1);render();await save('Episodio borrado de '+s.nombre)}
+
+// ---------- CANALES 24/7 ----------
+const fmt=s=>{s=Math.round(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h?h+' h '+m+' min':m+' min'};
+function catalogVideos(){const l=[];data.peliculas.forEach(p=>l.push({titulo:p.nombre,url:p.url,grupo:'Película · '+p.categoria}));data.series.forEach(s=>(s.episodios||[]).forEach(e=>l.push({titulo:s.nombre+': '+e.titulo,url:e.url,grupo:'Serie'})));return l}
+function openProg(i){progIdx=i;$('pgCanal').textContent=data.en_vivo[i].nombre;
+  const vids=catalogVideos();window.__vids=vids;$('pgSel').innerHTML=vids.map((v,k)=>`<option value="${k}">${esc(v.titulo)} — ${esc(v.grupo)}</option>`).join('');render()}
+function closeProg(){progIdx=-1;render()}
+function renderProg(){const c=data.en_vivo[progIdx];const pr=c.programacion||[];const tot=pr.reduce((a,x)=>a+(+x.duracion||0),0);
+  $('pgInfo').textContent=pr.length+' programas · el canal se repite cada '+fmt(tot)+'. La programación corre sola según la hora, como un canal de TV.';
+  $('tProg').innerHTML=pr.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.titulo)}</td><td class="muted">${fmt(x.duracion)}</td><td><div class="acts"><button class="sm sec" onclick="moveProg(${i},-1)">↑</button><button class="sm sec" onclick="moveProg(${i},1)">↓</button><button class="sm red" onclick="delProg(${i})">Quitar</button></div></td></tr>`).join('')||'<tr><td colspan="4" class="muted">Agrega videos a la programación</td></tr>'}
+function videoDuration(url){return new Promise((res,rej)=>{const v=document.createElement('video');v.preload='metadata';v.muted=true;const t=setTimeout(()=>{v.src='';rej(new Error('tiempo agotado'))},25000);
+  v.onloadedmetadata=()=>{clearTimeout(t);const d=v.duration;v.src='';isFinite(d)&&d>0?res(d):rej(new Error('sin duración'))};v.onerror=()=>{clearTimeout(t);rej(new Error('no se pudo abrir el video'))};v.src=url})}
+async function pushProg(titulo,url){const c=data.en_vivo[progIdx];$('saving').textContent='Midiendo duración del video…';
+  let d;try{d=await videoDuration(url)}catch(e){$('saving').textContent='';return toast('No pude leer el video: '+e.message,true)}
+  c.programacion=c.programacion||[];c.programacion.push({titulo,url,duracion:Math.round(d)});c.url=c.programacion[0].url;render();await save('Programación de '+c.nombre+': + '+titulo)}
+async function addProgFromCatalog(){const v=window.__vids[+$('pgSel').value];if(v)await pushProg(v.titulo,v.url)}
+async function addProgUrl(){const t=$('pgT').value.trim()||'Programa',u=$('pgU').value.trim();if(!/^https?:\/\//.test(u))return toast('Pega un enlace que empiece por http',true);$('pgT').value=$('pgU').value='';await pushProg(t,u)}
+async function delProg(i){const c=data.en_vivo[progIdx];const x=c.programacion.splice(i,1)[0];c.url=c.programacion[0]?c.programacion[0].url:'';render();await save('Programación de '+c.nombre+': − '+x.titulo)}
+async function moveProg(i,d){const p=data.en_vivo[progIdx].programacion;const j=i+d;if(j<0||j>=p.length)return;[p[i],p[j]]=[p[j],p[i]];data.en_vivo[progIdx].url=p[0].url;render();await save('Orden de '+data.en_vivo[progIdx].nombre)}
 
 // ---------- INICIO ----------
 (async()=>{const t=store.get('pc_tok');if(t){TOKEN=t;if(await load()){showApp();return}}$('login').classList.remove('hidden')})();
